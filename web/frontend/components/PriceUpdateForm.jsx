@@ -1,125 +1,134 @@
 // import { useState } from "react";
+// import {
+//   Card,
+//   TextField,
+//   Button,
+//   TextContainer,
+//   Text,
+//   Banner,
+//   Stack,
+// } from "@shopify/polaris";
+// import { useAppBridge } from "@shopify/app-bridge-react";
+// import { useMutation } from "react-query";
 
 // export function PriceUpdateForm() {
+//   const shopify = useAppBridge();
 //   const [productId, setProductId] = useState("");
-//   const [newTitle, setNewTitle] = useState("");
-//   const [loading, setLoading] = useState(false);
-//   const [message, setMessage] = useState("");
+//   const [variantId, setVariantId] = useState("");
+//   const [price, setPrice] = useState("");
+//   const [errorMessage, setErrorMessage] = useState("");
 
-//   const handleUpdateTitle = async () => {
-//     setLoading(true);
-//     setMessage("");
-
-//     try {
-//       const response = await fetch("/api/update-product-title", {
+//   const updatePriceMutation = useMutation(
+//     async (data) => {
+//       const response = await fetch("/api/update-price", {
 //         method: "POST",
 //         headers: {
 //           "Content-Type": "application/json",
 //         },
-//         body: JSON.stringify({
-//           productId: `gid://shopify/Product/${productId}`,
-//           newTitle,
-//         }),
+//         body: JSON.stringify(data),
 //       });
 
-//       const result = await response.json();
-//       if (result.success) {
-//         setMessage("商品タイトルが正常に更新されました！");
-//       } else {
-//         setMessage("商品タイトルの更新に失敗しました。");
-//         console.error(result.errors);
+//       if (!response.ok) {
+//         const error = await response.json();
+//         throw new Error(error.error || "Failed to update price");
 //       }
-//     } catch (error) {
-//       console.error("エラー:", error);
-//       setMessage("エラー！！！");
-//     } finally {
-//       setLoading(false);
+
+//       return response.json();
+//     },
+//     {
+//       onSuccess: () => {
+//         setProductId("");
+//         setVariantId("");
+//         setPrice("");
+
+//         shopify.toast.show("Price successfully updated");
+//       },
+//       onError: (error) => {
+//         setErrorMessage(error.message);
+//         shopify.toast.show(error.message, { isError: true });
+//       },
 //     }
+//   );
+
+//   const handleUpdatePrice = () => {
+//     setErrorMessage("");
+//     updatePriceMutation.mutate({ productId, variantId, price });
 //   };
 
+//   const isFormValid = productId && variantId && price;
+
 //   return (
-//     <div>
-//       <h2>商品のタイトルを更新</h2>
-//       <input
-//         type="text"
-//         placeholder="商品ID (数字部分のみ)"
-//         value={productId}
-//         onChange={(e) => setProductId(e.target.value)}
-//       />
-//       <input
-//         type="text"
-//         placeholder="新しい商品タイトル"
-//         value={newTitle}
-//         onChange={(e) => setNewTitle(e.target.value)}
-//       />
-//       <button onClick={handleUpdateTitle} disabled={loading}>
-//         {loading ? "更新中..." : "タイトルを更新する"}
-//       </button>
-//       {message && <p>{message}</p>}
-//     </div>
+//     <Card sectioned title="Update Product Price">
+//       <Stack vertical spacing="loose">
+//         {errorMessage && (
+//           <Banner status="critical">
+//             <p>{errorMessage}</p>
+//           </Banner>
+//         )}
+
+//         <TextContainer>
+//           <Text as="p" variant="bodyMd">
+//             Enter the Product and Variant IDs, then set the new price.
+//           </Text>
+//         </TextContainer>
+
+//         <Stack vertical spacing="tight">
+//           <TextField
+//             label="Product ID"
+//             value={productId}
+//             onChange={setProductId}
+//             placeholder="gid://shopify/Product/123456789"
+//             error={
+//               !productId && updatePriceMutation.isError
+//                 ? "Product ID is required"
+//                 : undefined
+//             }
+//             autoComplete="off"
+//             helpText="Enter the Shopify Product ID (starts with gid://shopify/Product/)"
+//           />
+
+//           <TextField
+//             label="Variant ID"
+//             value={variantId}
+//             onChange={setVariantId}
+//             placeholder="gid://shopify/ProductVariant/1234567890"
+//             error={
+//               !variantId && updatePriceMutation.isError
+//                 ? "Variant ID is required"
+//                 : undefined
+//             }
+//             autoComplete="off"
+//             helpText="Enter the Shopify Variant ID (starts with gid://shopify/ProductVariant/)"
+//           />
+
+//           <TextField
+//             label="New Price"
+//             value={price}
+//             onChange={setPrice}
+//             type="number"
+//             placeholder="12.34"
+//             error={
+//               !price && updatePriceMutation.isError
+//                 ? "Price is required"
+//                 : undefined
+//             }
+//             suffix="CAD"
+//             autoComplete="off"
+//             helpText="Enter the new price in CAD"
+//           />
+//         </Stack>
+
+//         <Stack distribution="trailing">
+//           <Button
+//             primary
+//             onClick={handleUpdatePrice}
+//             loading={updatePriceMutation.isLoading}
+//             disabled={!isFormValid || updatePriceMutation.isLoading}
+//           >
+//             Update Price
+//           </Button>
+//         </Stack>
+//       </Stack>
+//     </Card>
 //   );
 // }
-
-import { useState } from "react";
-import { Card, TextField, Button } from "@shopify/polaris";
-
-export function PriceUpdateForm() {
-  const [productId, setProductId] = useState("");
-  const [variantId, setVariantId] = useState("");
-  const [price, setPrice] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleUpdatePrice = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch("/api/update-price", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ productId, variantId, price }),
-      });
-
-      const result = await response.json();
-      if (response.ok) {
-        console.log(result.product);
-        alert("価格が正常に更新されました！");
-      } else {
-        console.error(result.error);
-        alert("エラーが発生！！！");
-      }
-    } catch (error) {
-      console.error("リクエスト失敗:", error);
-      alert("サーバー接続エラーが発生しました。");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <Card sectioned title="Change Product Price">
-      <TextField
-        label="Product ID"
-        value={productId}
-        onChange={setProductId}
-        placeholder="gid://shopify/Product/123456789"
-      />
-      <TextField
-        label="Variant ID"
-        value={variantId}
-        onChange={setVariantId}
-        placeholder="gid://shopify/ProductVariant/1234567890"
-      />
-      <TextField
-        label="New Price"
-        value={price}
-        onChange={setPrice}
-        type="number"
-        placeholder="12.34"
-      />
-      <Button onClick={handleUpdatePrice} primary loading={loading}>
-        価格を更新する
-      </Button>
-    </Card>
-  );
-}
