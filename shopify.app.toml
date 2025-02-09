@@ -1,14 +1,14 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "2d68e2aa756268c482be8da0b5029207"
-application_url = "https://worked-once-greater-arthur.trycloudflare.com"
+application_url = "https://starter-francis-tin-advancement.trycloudflare.com"
 embedded = true
 name = "fumiya-shop"
 handle = "fumiya-shop"
 
 [build]
-include_config_on_deploy = true
 automatically_update_urls_on_dev = true
+include_config_on_deploy = true
 
 [webhooks]
 api_version = "2025-01"
@@ -19,9 +19,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://worked-once-greater-arthur.trycloudflare.com/auth/callback",
-  "https://worked-once-greater-arthur.trycloudflare.com/auth/shopify/callback",
-  "https://worked-once-greater-arthur.trycloudflare.com/api/auth/callback"
+  "https://starter-francis-tin-advancement.trycloudflare.com/auth/callback",
+  "https://starter-francis-tin-advancement.trycloudflare.com/auth/shopify/callback",
+  "https://starter-francis-tin-advancement.trycloudflare.com/api/auth/callback"
 ]
 
 [pos]

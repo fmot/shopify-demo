@@ -13,7 +13,7 @@ import { useTranslation, Trans } from "react-i18next";
 
 import { trophyImage } from "../assets";
 
-import { ProductsCard } from "../components";
+import { ProductsCard, PriceUpdateForm } from "../components";
 
 export default function HomePage() {
   const { t } = useTranslation();
@@ -86,6 +86,9 @@ export default function HomePage() {
         </Layout.Section>
         <Layout.Section>
           <ProductsCard />
+        </Layout.Section>
+        <Layout.Section>
+          <PriceUpdateForm />
         </Layout.Section>
       </Layout>
     </Page>
