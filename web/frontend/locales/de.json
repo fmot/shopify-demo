@@ -20,19 +20,5 @@
     "primaryAction": "Primäre Aktion",
     "secondaryAction": "Sekundäre Aktion",
     "title": "Seitenname"
-  },
-  "ProductsCard": {
-    "description": "Beispielprodukte werden mit einem Standardtitel und -preis erstellt. Du kannst sie jederzeit entfernen.",
-    "errorCreatingProductsToast": "Beim Erstellen von Produkten ist ein Fehler aufgetreten",
-    "populateProductsButton": {
-      "one": "{{count}} Produkt bereitstellen",
-      "other": "{{count}} Produkte bereitstellen"
-    },
-    "productsCreatedToast": {
-      "one": "{{count}} Produkt erstellt!",
-      "other": "{{count}} Produkte erstellt!"
-    },
-    "title": "Produktzähler",
-    "totalProductsHeading": "PRODUKTE INSGESAMT"
   }
 }

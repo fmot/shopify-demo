@@ -20,21 +20,5 @@
     "primaryAction": "Action principale",
     "secondaryAction": "Action secondaire",
     "title": "Nom de la page"
-  },
-  "ProductsCard": {
-    "description": "Les exemples de produits sont créés avec un titre et un prix par défaut. Vous pouvez les supprimer à tout moment.",
-    "errorCreatingProductsToast": "Une erreur est survenue lors de la création des produits",
-    "populateProductsButton": {
-      "one": "Remplir {{count}} produit",
-      "other": "Remplir {{count}} produits",
-      "many": "Remplir {{count}} produits"
-    },
-    "productsCreatedToast": {
-      "one": "{{count}} produit créé !",
-      "other": "{{count}} produits créés !",
-      "many": "{{count}} produits créés !"
-    },
-    "title": "Compteur de produits",
-    "totalProductsHeading": "TOTAL DES PRODUITS"
   }
 }

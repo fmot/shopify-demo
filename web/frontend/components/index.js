@@ -1,4 +1,3 @@
-export { ProductsCard } from "./ProductsCard";
 // export { PriceUpdateForm } from "./PriceUpdateForm";
 export { BulkPriceUpdateContainer } from "./BulkPriceUpdateContainer";
 export { BulkPriceUpdateForm } from "./BulkPriceUpdateForm";
