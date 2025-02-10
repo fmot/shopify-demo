@@ -35,42 +35,58 @@ export function ProductList({ onUpdatePrices, isUpdating }) {
         renderItem={(product) => (
           <ResourceItem id={product.id}>
             <Stack distribution="equalSpacing" alignment="center">
-              <Checkbox
-                label={product.title}
-                labelHidden
-                checked={selectedProducts.has(product.id)}
-                onChange={(checked) => {
-                  const newSelected = new Set(selectedProducts);
-                  if (checked) {
-                    newSelected.add(product.id);
-                  } else {
-                    newSelected.delete(product.id);
-                  }
-                  setSelectedProducts(newSelected);
-                }}
-              />
-              <div>{product.title}</div>
-              <TextField
-                label="Price"
-                labelHidden
-                type="number"
-                value={priceUpdates[product.id] || product.variants[0].price}
-                onChange={(value) =>
-                  setPriceUpdates((prev) => ({
-                    ...prev,
-                    [product.id]: value,
-                  }))
-                }
-                suffix="CAD"
-                autoComplete="off"
-              />
+              <Stack.Item>
+                <Checkbox
+                  label={product.title}
+                  labelHidden
+                  checked={selectedProducts.has(product.id)}
+                  onChange={(checked) => {
+                    const newSelected = new Set(selectedProducts);
+                    if (checked) {
+                      newSelected.add(product.id);
+                    } else {
+                      newSelected.delete(product.id);
+                    }
+                    setSelectedProducts(newSelected);
+                  }}
+                />
+              </Stack.Item>
+              <Stack.Item>
+                <div>{product.title}</div>
+              </Stack.Item>
+              <Stack.Item>
+                {product.variants.map((variant, index) => (
+                  <TextField
+                    key={variant.id}
+                    label={`Variant ${index + 1} Price`}
+                    labelHidden
+                    type="number"
+                    value={priceUpdates[variant.id] || variant.price}
+                    onChange={(value) =>
+                      setPriceUpdates((prev) => ({
+                        ...prev,
+                        [variant.id]: value,
+                      }))
+                    }
+                    suffix="CAD"
+                    autoComplete="off"
+                  />
+                ))}
+              </Stack.Item>
             </Stack>
           </ResourceItem>
         )}
       />
-      <Button primary onClick={handleUpdatePrices} loading={isUpdating}>
-        Update Selected Prices
-      </Button>
+      <div>
+        <Button
+          primary
+          onClick={handleUpdatePrices}
+          loading={isUpdating}
+          disabled={selectedProducts.size === 0}
+        >
+          Update Selected Prices ({selectedProducts.size} products)
+        </Button>
+      </div>
     </>
   );
 }

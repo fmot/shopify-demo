@@ -178,71 +178,94 @@ app.get("/api/get-products", async (_req, res) => {
 
 app.post("/api/bulk-update-prices", async (req, res) => {
   const { updates } = req.body;
-
-  console.error("Received bulk update request:", updates);
+  console.log("Received bulk update request:", updates);
 
   try {
     const client = new shopify.api.clients.Graphql({
       session: res.locals.shopify.session,
     });
 
-    // 最初のアップデートのproductIdを使用
-    const productId = updates[0].productId;
+    const updatesByProduct = updates.reduce((acc, update) => {
+      if (!acc[update.productId]) {
+        acc[update.productId] = [];
+      }
+      acc[update.productId].push({
+        id: update.variantId,
+        price: update.price.toString(),
+      });
+      return acc;
+    }, {});
 
-    const response = await client.query({
-      data: {
-        query: `
-          mutation variantsToBulkUpdate($productId: ID!, $variantsToBulkUpdate: [ProductVariantsBulkInput!]!) {
-            productVariantsBulkUpdate(
-              productId: $productId
-              variants: $variantsToBulkUpdate
-            ) {
-              userErrors {
-                field
-                message
-              }
-              product {
-                id
+    console.log("updatesByProduct:", updatesByProduct);
+
+    const updatePromises = Object.entries(updatesByProduct).map(
+      ([productId, variants]) => {
+        return client.query({
+          data: {
+            query: `
+            mutation productVariantsBulkUpdate($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
+              productVariantsBulkUpdate(productId: $productId, variants: $variants) {
+                product {
+                  id
+                  title
+                }
+                productVariants {
+                  id
+                  price
+                }
+                userErrors {
+                  field
+                  message
+                }
               }
             }
-          }
-        `,
-        variables: {
-          productId: productId,
-          variantsToBulkUpdate: updates.map((update) => ({
-            id: update.variantId,
-            price: update.price.toString(),
-          })),
-        },
-      },
+          `,
+            variables: {
+              productId: productId,
+              variants: variants,
+            },
+          },
+        });
+      }
+    );
+
+    const results = await Promise.all(updatePromises);
+
+    const errors = [];
+    const successfulUpdates = [];
+
+    results.forEach((response) => {
+      const result = response.body.data.productVariantsBulkUpdate;
+      if (result.userErrors && result.userErrors.length > 0) {
+        errors.push({
+          productId: result.product.id,
+          productTitle: result.product.title,
+          errors: result.userErrors,
+        });
+      } else {
+        successfulUpdates.push({
+          productId: result.product.id,
+          productTitle: result.product.title,
+          variants: result.productVariants,
+        });
+      }
     });
 
-    console.log("GraphQL Response:", response.body);
-
-    // userErrorsをチェック
-    const userErrors = response.body.data.productVariantsBulkUpdate.userErrors;
-    if (userErrors && userErrors.length > 0) {
-      console.error("User Errors:", userErrors);
-      return res.status(400).send({
-        error: "Price update failed",
-        details: userErrors,
+    if (errors.length > 0) {
+      return res.status(400).json({
+        error: "Some price updates failed",
+        details: errors,
+        successfulUpdates,
       });
     }
 
-    res.status(200).send({
+    res.status(200).json({
       success: true,
-      product: response.body.data.productVariantsBulkUpdate.product,
+      updates: successfulUpdates,
     });
   } catch (error) {
-    if (error.response && error.response.body) {
-      console.error(
-        "GraphQL Error Details:",
-        JSON.stringify(error.response.body, null, 2)
-      );
-    } else {
-      console.error("Error:", error);
-    }
-    res.status(500).send({ error: "Failed to update prices" });
+    console.error("Error updating prices:", error);
+    res.status(500).json({ error: "Failed to update prices" });
   }
 });
 

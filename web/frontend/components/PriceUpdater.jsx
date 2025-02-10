@@ -5,7 +5,7 @@ import { Card } from "@shopify/polaris";
 
 export function PriceUpdater() {
   const [isUpdating, setIsUpdating] = useState(false);
-  const shopify = useAppBridge();
+  const app = useAppBridge();
 
   const handleUpdatePrices = async (
     selectedProducts,
@@ -13,21 +13,19 @@ export function PriceUpdater() {
     products
   ) => {
     if (selectedProducts.size === 0) {
-      shopify.toast.show("Please select at least one product", {
-        isError: true,
-      });
+      app.toast.show("Please select at least one product");
       return;
     }
 
     setIsUpdating(true);
     try {
-      const updates = Array.from(selectedProducts).map((productId) => {
+      const updates = Array.from(selectedProducts).flatMap((productId) => {
         const product = products.find((p) => p.id === productId);
-        return {
-          productId,
-          variantId: product.variants[0].id,
-          price: priceUpdates[productId] || product.variants[0].price,
-        };
+        return product.variants.map((variant) => ({
+          productId: productId,
+          variantId: variant.id,
+          price: priceUpdates[variant.id] || variant.price,
+        }));
       });
 
       const response = await fetch("/api/bulk-update-prices", {
@@ -36,14 +34,24 @@ export function PriceUpdater() {
         body: JSON.stringify({ updates }),
       });
 
+      const result = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to update prices");
+        const errorMessage = result.details
+          ? `Some updates failed: ${result.details
+              .map((e) => e.productTitle)
+              .join(", ")}`
+          : "Failed to update prices";
+        throw new Error(errorMessage);
       }
 
-      shopify.toast.show("Prices updated successfully");
+      const successMessage = `Successfully updated ${result.updates.length} product(s)`;
+      app.toast.show(successMessage);
     } catch (error) {
       console.error("Error updating prices:", error);
-      shopify.toast.show("Failed to update prices", { isError: true });
+      app.toast.show(error.message || "Failed to update prices", {
+        isError: true,
+      });
     } finally {
       setIsUpdating(false);
     }
