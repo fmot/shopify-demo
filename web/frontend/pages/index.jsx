@@ -13,7 +13,7 @@ import { useTranslation, Trans } from "react-i18next";
 
 import { trophyImage } from "../assets";
 
-import { ProductsCard, PriceUpdater } from "../components";
+import { ProductsCard, BulkPriceUpdateContainer } from "../components";
 
 export default function HomePage() {
   const { t } = useTranslation();
@@ -88,7 +88,7 @@ export default function HomePage() {
           <ProductsCard />
         </Layout.Section>
         <Layout.Section>
-          <PriceUpdater />
+          <BulkPriceUpdateContainer />
         </Layout.Section>
       </Layout>
     </Page>
