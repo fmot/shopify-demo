@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { useAppBridge } from "@shopify/app-bridge-react";
-import { Button, Modal } from "@shopify/polaris";
+import { Card, TextContainer, Text, Modal } from "@shopify/polaris";
 import { BulkPriceUpdateForm } from "./BulkPriceUpdateForm";
 import { useQuery, useQueryClient } from "react-query";
 
@@ -97,7 +97,22 @@ export function BulkPriceUpdateContainer() {
 
   return (
     <>
-      <Button onClick={handleModalOpen}>Update Prices</Button>
+      <Card
+        title="Let's update some prices!"
+        sectioned
+        primaryFooterAction={{
+          content: "Update Product Prices",
+          onAction: handleModalOpen,
+          disabled: isLoading,
+        }}
+      >
+        <TextContainer spacing="loose">
+          <Text as="p">
+            You can update prices for multiple products at once. Select the
+            products you want to modify and input new prices.
+          </Text>
+        </TextContainer>
+      </Card>
       <Modal
         open={isModalOpen}
         onClose={handleModalClose}
