@@ -6,6 +6,7 @@ import serveStatic from "serve-static";
 
 import shopify from "./shopify.js";
 import PrivacyWebhookHandlers from "./privacy.js";
+import { TestCron } from "./jobs/cron-test.js";
 
 const PORT = parseInt(
   process.env.BACKEND_PORT || process.env.PORT || "3000",
@@ -251,5 +252,22 @@ app.use("/*", shopify.ensureInstalledOnShop(), async (_req, res, _next) => {
         .replace("%VITE_SHOPIFY_API_KEY%", process.env.SHOPIFY_API_KEY || "")
     );
 });
+
+app.get("/api/auth/offline", async (req, res) => {
+  const { shop } = req.query;
+  if (!shop) {
+    return res.status(400).send("Missing shop parameter.");
+  }
+
+  return shopify.api.auth.begin({
+    shop,
+    callbackPath: "/api/auth/offline/callback",
+    isOnline: false,
+    rawRequest: req,
+    rawResponse: res,
+  });
+});
+
+TestCron();
 
 app.listen(PORT);
