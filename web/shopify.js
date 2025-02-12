@@ -30,6 +30,7 @@ const shopify = shopifyApp({
   auth: {
     path: "/api/auth",
     callbackPath: "/api/auth/callback",
+    isOnline: false,
   },
   webhooks: {
     path: "/api/webhooks",

@@ -35,7 +35,8 @@ app.post(
 // If you are adding routes outside of the /api path, remember to
 // also add a proxy rule for them in web/frontend/vite.config.js
 
-app.use("/api/*", shopify.validateAuthenticatedSession());
+// for online session
+// app.use("/api/*", shopify.validateAuthenticatedSession());
 
 app.use(express.json());
 
@@ -108,9 +109,17 @@ app.use(express.json());
 
 app.get("/api/get-products", async (_req, res) => {
   try {
-    const client = new shopify.api.clients.Graphql({
-      session: res.locals.shopify.session,
-    });
+    const shopDomain = "fumiya-shop.myshopify.com";
+    const sessionId = shopify.api.session.getOfflineId(shopDomain);
+    const session = await shopify.config.sessionStorage.loadSession(sessionId);
+
+    if (!session) {
+      return res
+        .status(403)
+        .send({ error: "No offline session found for this shop" });
+    }
+
+    const client = new shopify.api.clients.Graphql({ session });
 
     const response = await client.query({
       data: {
@@ -151,9 +160,17 @@ app.post("/api/bulk-update-prices", async (req, res) => {
   console.log("Received bulk update request:", updates);
 
   try {
-    const client = new shopify.api.clients.Graphql({
-      session: res.locals.shopify.session,
-    });
+    const shopDomain = "fumiya-shop.myshopify.com";
+    const sessionId = shopify.api.session.getOfflineId(shopDomain);
+    const session = await shopify.config.sessionStorage.loadSession(sessionId);
+
+    if (!session) {
+      return res
+        .status(403)
+        .send({ error: "No offline session found for this shop" });
+    }
+
+    const client = new shopify.api.clients.Graphql({ session });
 
     const updatesByProduct = updates.reduce((acc, update) => {
       if (!acc[update.productId]) {
@@ -251,21 +268,6 @@ app.use("/*", shopify.ensureInstalledOnShop(), async (_req, res, _next) => {
         .toString()
         .replace("%VITE_SHOPIFY_API_KEY%", process.env.SHOPIFY_API_KEY || "")
     );
-});
-
-app.get("/api/auth/offline", async (req, res) => {
-  const { shop } = req.query;
-  if (!shop) {
-    return res.status(400).send("Missing shop parameter.");
-  }
-
-  return shopify.api.auth.begin({
-    shop,
-    callbackPath: "/api/auth/offline/callback",
-    isOnline: false,
-    rawRequest: req,
-    rawResponse: res,
-  });
 });
 
 TestCron();
