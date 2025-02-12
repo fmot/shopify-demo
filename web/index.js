@@ -6,7 +6,7 @@ import serveStatic from "serve-static";
 
 import shopify from "./shopify.js";
 import PrivacyWebhookHandlers from "./privacy.js";
-import { TestCron } from "./jobs/cron-test.js";
+import { UpdateTitle } from "./jobs/update-title.js";
 
 const PORT = parseInt(
   process.env.BACKEND_PORT || process.env.PORT || "3000",
@@ -270,6 +270,6 @@ app.use("/*", shopify.ensureInstalledOnShop(), async (_req, res, _next) => {
     );
 });
 
-TestCron();
+UpdateTitle();
 
 app.listen(PORT);
