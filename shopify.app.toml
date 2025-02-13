@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "2d68e2aa756268c482be8da0b5029207"
-application_url = "https://dozens-ethical-names-todd.trycloudflare.com"
+application_url = "https://fumiya-shop.herokuapp.com"
 embedded = true
 name = "fumiya-shop"
 handle = "fumiya-shop"
@@ -19,9 +19,9 @@ scopes = "read_products,write_products"
 
 [auth]
 redirect_urls = [
-  "https://dozens-ethical-names-todd.trycloudflare.com/auth/callback",
-  "https://dozens-ethical-names-todd.trycloudflare.com/auth/shopify/callback",
-  "https://dozens-ethical-names-todd.trycloudflare.com/api/auth/callback"
+  "https://fumiya-shop.herokuapp.com/auth/callback",
+  "https://fumiya-shop.herokuapp.com/auth/shopify/callback",
+  "https://fumiya-shop.herokuapp.com/api/auth/callback"
 ]
 
 [pos]
