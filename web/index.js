@@ -3,10 +3,13 @@ import { join } from "path";
 import { readFileSync } from "fs";
 import express from "express";
 import serveStatic from "serve-static";
+import dotenv from "dotenv";
 
 import shopify from "./shopify.js";
 import PrivacyWebhookHandlers from "./privacy.js";
 import { UpdateTitle } from "./jobs/update-title.js";
+
+dotenv.config();
 
 const PORT = parseInt(
   process.env.BACKEND_PORT || process.env.PORT || "3000",

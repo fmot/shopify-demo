@@ -11,12 +11,14 @@
     "generate": "shopify app generate",
     "deploy": "shopify app deploy"
   },
-  "dependencies": {},
   "author": "otakefumiya",
   "private": true,
   "workspaces": [
     "extensions/*",
     "web",
     "web/frontend"
-  ]
+  ],
+  "dependencies": {
+    "dotenv": "^16.4.7"
+  }
 }

@@ -33,9 +33,7 @@ export function UpdateTitle() {
     `;
 
     try {
-      const response = await fetch(
-        "https://too-resort-turned-awareness.trycloudflare.com/api/get-products"
-      );
+      const response = await fetch(`${process.env.BASE_URL}/api/get-products`);
       if (!response.ok) {
         console.error(
           "[CRON] Failed to fetch products. Status:",
