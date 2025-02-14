@@ -13,6 +13,7 @@ export function BulkPriceUpdateForm({
   isLoading,
   selectedProducts,
   priceUpdates,
+  priceErrors,
   onProductSelect,
   onPriceChange,
 }) {
@@ -46,6 +47,7 @@ export function BulkPriceUpdateForm({
                   onChange={(value) => onPriceChange(variant.id, value)}
                   suffix="CAD"
                   autoComplete="off"
+                  error={priceErrors[variant.id]}
                 />
               ))}
             </Stack.Item>

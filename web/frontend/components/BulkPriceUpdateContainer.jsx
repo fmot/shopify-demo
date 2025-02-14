@@ -4,11 +4,14 @@ import { Card, TextContainer, Text, Modal } from "@shopify/polaris";
 import { BulkPriceUpdateForm } from "./BulkPriceUpdateForm";
 import { useQuery, useQueryClient } from "react-query";
 
+const MAX_PRICE = 999999.99;
+
 export function BulkPriceUpdateContainer() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState(new Set());
   const [priceUpdates, setPriceUpdates] = useState({});
+  const [priceErrors, setPriceErrors] = useState({});
   const app = useAppBridge();
   const queryClient = useQueryClient();
 
@@ -24,6 +27,7 @@ export function BulkPriceUpdateContainer() {
     setIsModalOpen(true);
     setSelectedProducts(new Set());
     setPriceUpdates({});
+    setPriceErrors({});
   }, []);
 
   const handleModalClose = useCallback(() => {
@@ -43,15 +47,44 @@ export function BulkPriceUpdateContainer() {
   }, []);
 
   const handlePriceChange = useCallback((variantId, value) => {
+    if (value === "") {
+      setPriceUpdates((prev) => ({ ...prev, [variantId]: value }));
+      return;
+    }
+
+    const parsed = parseFloat(value);
+    const regex = /^\d+(\.\d{0,2})?$/;
+
+    if (
+      isNaN(parsed) ||
+      parsed < 0 ||
+      parsed > MAX_PRICE ||
+      !regex.test(value)
+    ) {
+      setPriceErrors((prev) => ({
+        ...prev,
+        [variantId]: "Please input a valid price",
+      }));
+    } else {
+      setPriceErrors((prev) => ({ ...prev, [variantId]: null }));
+    }
     setPriceUpdates((prev) => ({
       ...prev,
       [variantId]: value,
     }));
   }, []);
 
+  const isFormValid = Object.values(priceErrors).every((error) => !error);
+
   const handleUpdatePrices = async () => {
     if (selectedProducts.size === 0) {
       app.toast.show("Please select at least one product");
+      return;
+    }
+    if (!isFormValid) {
+      app.toast.show("Please correct the errors before saving changes", {
+        isError: true,
+      });
       return;
     }
 
@@ -78,7 +111,6 @@ export function BulkPriceUpdateContainer() {
         throw new Error(result.error || "Failed to update prices");
       }
 
-      // refetch data after successful price update
       await queryClient.invalidateQueries("products");
 
       app.toast.show(
@@ -109,7 +141,8 @@ export function BulkPriceUpdateContainer() {
         <TextContainer spacing="loose">
           <Text as="p">
             You can update prices for multiple products at once. Select the
-            products you want to modify and input new prices.
+            products you want to modify and input new prices. *Maximum price is
+            ${MAX_PRICE}
           </Text>
         </TextContainer>
       </Card>
@@ -121,7 +154,7 @@ export function BulkPriceUpdateContainer() {
           content: "Save Changes",
           onAction: handleUpdatePrices,
           loading: isUpdating,
-          disabled: selectedProducts.size === 0,
+          disabled: selectedProducts.size === 0 || !isFormValid,
         }}
         secondaryActions={[
           {
@@ -137,6 +170,7 @@ export function BulkPriceUpdateContainer() {
             isLoading={isLoading}
             selectedProducts={selectedProducts}
             priceUpdates={priceUpdates}
+            priceErrors={priceErrors}
             onProductSelect={handleProductSelect}
             onPriceChange={handlePriceChange}
           />
