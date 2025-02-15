@@ -65,9 +65,10 @@ app.get("/api/get-products", async (_req, res) => {
               nodes {
                 id
                 title
-                variants(first: 1) {
+                variants(first: 50) {
                   nodes {
                     id
+                    title
                     price
                   }
                 }
@@ -81,7 +82,11 @@ app.get("/api/get-products", async (_req, res) => {
     const products = response.body.data.products.nodes.map((product) => ({
       id: product.id,
       title: product.title,
-      variants: product.variants.nodes,
+      variants: product.variants.nodes.map((variant) => ({
+        id: variant.id,
+        title: variant.title,
+        price: variant.price,
+      })),
     }));
 
     res.status(200).json(products);

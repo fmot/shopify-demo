@@ -49,6 +49,7 @@ export function BulkPriceUpdateContainer() {
   const handlePriceChange = useCallback((variantId, value) => {
     if (value === "") {
       setPriceUpdates((prev) => ({ ...prev, [variantId]: value }));
+      setPriceErrors((prev) => ({ ...prev, [variantId]: null }));
       return;
     }
 
@@ -74,14 +75,24 @@ export function BulkPriceUpdateContainer() {
     }));
   }, []);
 
-  const isFormValid = Object.values(priceErrors).every((error) => !error);
+  const isFormValid = useCallback(() => {
+    const selectedVariantErrors = Array.from(selectedProducts).flatMap(
+      (productId) => {
+        const product = products?.find((p) => p.id === productId);
+        if (!product) return [];
+        return product.variants.map((variant) => priceErrors[variant.id]);
+      }
+    );
+
+    return selectedVariantErrors.every((error) => !error);
+  }, [selectedProducts, products, priceErrors]);
 
   const handleUpdatePrices = async () => {
     if (selectedProducts.size === 0) {
       app.toast.show("Please select at least one product");
       return;
     }
-    if (!isFormValid) {
+    if (!isFormValid()) {
       app.toast.show("Please correct the errors before saving changes", {
         isError: true,
       });
@@ -154,7 +165,7 @@ export function BulkPriceUpdateContainer() {
           content: "Save Changes",
           onAction: handleUpdatePrices,
           loading: isUpdating,
-          disabled: selectedProducts.size === 0 || !isFormValid,
+          disabled: selectedProducts.size === 0 || !isFormValid(),
         }}
         secondaryActions={[
           {
