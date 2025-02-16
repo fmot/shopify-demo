@@ -8,7 +8,7 @@ import {
   Spinner,
   Collapsible,
   Button,
-  TextStyle,
+  Text,
   Card,
 } from "@shopify/polaris";
 
@@ -52,7 +52,7 @@ export function BulkPriceUpdateForm({
                     checked={selectedProducts.has(product.id)}
                     onChange={(checked) => onProductSelect(product.id, checked)}
                   />
-                  <TextStyle variation="strong">{product.title}</TextStyle>
+                  <Text>{product.title}</Text>
                 </Stack>
               </Stack.Item>
               <Stack.Item>
@@ -62,7 +62,7 @@ export function BulkPriceUpdateForm({
                   ariaExpanded={expandedProducts.has(product.id)}
                   ariaControls={`variants-${product.id}`}
                 >
-                  {expandedProducts.has(product.id) ? "Fold all" : "Expand all"}
+                  {expandedProducts.has(product.id) ? "Fold" : "Expand"}
                 </Button>
               </Stack.Item>
             </Stack>
@@ -81,7 +81,7 @@ export function BulkPriceUpdateForm({
                         alignment="center"
                       >
                         <Stack.Item>
-                          <TextStyle>{variant.title}</TextStyle>
+                          <Text>{variant.title}</Text>
                         </Stack.Item>
                         <Stack.Item>
                           <TextField
