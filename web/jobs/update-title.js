@@ -33,7 +33,9 @@ export function UpdateTitle() {
     `;
 
     try {
-      const response = await fetch(`${process.env.HOST}/api/get-products`);
+      const response = await fetch(
+        `${process.env.HOST}/api/get-products-for-updating-title`
+      );
       if (!response.ok) {
         console.error(
           "[CRON] Failed to fetch products. Status:",

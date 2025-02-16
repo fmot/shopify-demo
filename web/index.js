@@ -45,8 +45,7 @@ app.use(express.json());
 
 app.get("/api/get-products", async (_req, res) => {
   try {
-    const shopDomain = "fumiya-shop.myshopify.com";
-    const sessionId = shopify.api.session.getOfflineId(shopDomain);
+    const sessionId = shopify.api.session.getOfflineId(process.env.SHOP_DOMAIN);
     const session = await shopify.config.sessionStorage.loadSession(sessionId);
 
     if (!session) {
@@ -61,11 +60,11 @@ app.get("/api/get-products", async (_req, res) => {
       data: {
         query: `
           query {
-            products(first: 50) {
+            products(first: 100) {
               nodes {
                 id
                 title
-                variants(first: 50) {
+                variants(first: 100) {
                   nodes {
                     id
                     title
@@ -96,12 +95,51 @@ app.get("/api/get-products", async (_req, res) => {
   }
 });
 
+app.get("/api/get-products-for-updating-title", async (_req, res) => {
+  try {
+    const sessionId = shopify.api.session.getOfflineId(process.env.SHOP_DOMAIN);
+    const session = await shopify.config.sessionStorage.loadSession(sessionId);
+
+    if (!session) {
+      return res
+        .status(403)
+        .send({ error: "No offline session found for this shop" });
+    }
+
+    const client = new shopify.api.clients.Graphql({ session });
+
+    const response = await client.query({
+      data: {
+        query: `
+          query {
+            products(first: 100) {
+              nodes {
+                id
+                title
+              }
+            }
+          }
+        `,
+      },
+    });
+
+    const products = response.body.data.products.nodes.map((product) => ({
+      id: product.id,
+      title: product.title,
+    }));
+
+    res.status(200).json(products);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).send({ error: "Failed to fetch products" });
+  }
+});
+
 app.post("/api/bulk-update-prices", async (req, res) => {
   const { updates } = req.body;
 
   try {
-    const shopDomain = "fumiya-shop.myshopify.com";
-    const sessionId = shopify.api.session.getOfflineId(shopDomain);
+    const sessionId = shopify.api.session.getOfflineId(process.env.SHOP_DOMAIN);
     const session = await shopify.config.sessionStorage.loadSession(sessionId);
 
     if (!session) {
