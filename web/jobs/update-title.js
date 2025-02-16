@@ -6,7 +6,7 @@ export function UpdateTitle() {
   cron.schedule("0 * * * *", async () => {
     console.log("[CRON] Starting product title update job...");
 
-    const shopDomain = "fumiya-shop.myshopify.com";
+    const shopDomain = process.env.SHOP_DOMAIN;
     const sessionId = shopify.api.session.getOfflineId(shopDomain);
     const session = await shopify.config.sessionStorage.loadSession(sessionId);
 
@@ -33,7 +33,7 @@ export function UpdateTitle() {
     `;
 
     try {
-      const response = await fetch(`${process.env.BASE_URL}/api/get-products`);
+      const response = await fetch(`${process.env.HOST}/api/get-products`);
       if (!response.ok) {
         console.error(
           "[CRON] Failed to fetch products. Status:",
