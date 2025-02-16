@@ -1,6 +1,6 @@
 # Shopify App
 
-これはバックエンドにnode.jsとフロントエンドにreactを使ったshopify Appです。
+これはバックエンドにnode.jsとフロントエンドにreactを使ったShopify Appです。
 
 ## 主な機能
 
