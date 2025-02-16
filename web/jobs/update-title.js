@@ -43,9 +43,36 @@ export function UpdateTitle() {
       }
       const products = await response.json();
 
-      for (const product of products) {
+      for (const [index, product] of products.entries()) {
         const productId = product.id;
-        const newTitle = `Updated Title ${new Date().toISOString()}`;
+
+        const dateOptions = {
+          timeZone: "America/Vancouver",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        };
+
+        const timeOptions = {
+          timeZone: "America/Vancouver",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        };
+
+        const now = new Date();
+
+        const formattedDate = new Intl.DateTimeFormat(
+          "en-CA",
+          dateOptions
+        ).format(now);
+        const formattedTime = new Intl.DateTimeFormat(
+          "en-CA",
+          timeOptions
+        ).format(now);
+        const newTitle = `T-shirt${
+          index + 1
+        } ${formattedDate} ${formattedTime}`;
 
         try {
           const mutationResponse = await client.query({
