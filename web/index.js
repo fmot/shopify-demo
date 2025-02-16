@@ -98,7 +98,6 @@ app.get("/api/get-products", async (_req, res) => {
 
 app.post("/api/bulk-update-prices", async (req, res) => {
   const { updates } = req.body;
-  console.log("Received bulk update request:", updates);
 
   try {
     const shopDomain = "fumiya-shop.myshopify.com";
@@ -123,8 +122,6 @@ app.post("/api/bulk-update-prices", async (req, res) => {
       });
       return acc;
     }, {});
-
-    console.log("updatesByProduct:", updatesByProduct);
 
     const updatePromises = Object.entries(updatesByProduct).map(
       ([productId, variants]) => {
