@@ -15,10 +15,10 @@ import {
 export function BulkPriceUpdateForm({
   products,
   isLoading,
-  selectedProducts,
+  selectedVariants,
   priceUpdates,
   priceErrors,
-  onProductSelect,
+  onVariantSelect,
   onPriceChange,
 }) {
   const [expandedProducts, setExpandedProducts] = useState(new Set());
@@ -45,15 +45,7 @@ export function BulkPriceUpdateForm({
           <Stack vertical spacing="tight">
             <Stack distribution="equalSpacing" alignment="center">
               <Stack.Item>
-                <Stack spacing="tight" alignment="center">
-                  <Checkbox
-                    label={product.title}
-                    labelHidden
-                    checked={selectedProducts.has(product.id)}
-                    onChange={(checked) => onProductSelect(product.id, checked)}
-                  />
-                  <Text>{product.title}</Text>
-                </Stack>
+                <Text>{product.title}</Text>
               </Stack.Item>
               <Stack.Item>
                 <Button
@@ -81,7 +73,13 @@ export function BulkPriceUpdateForm({
                         alignment="center"
                       >
                         <Stack.Item>
-                          <Text>{variant.title}</Text>
+                          <Checkbox
+                            label={variant.title}
+                            checked={selectedVariants.has(variant.id)}
+                            onChange={(checked) =>
+                              onVariantSelect(variant.id, checked)
+                            }
+                          />
                         </Stack.Item>
                         <Stack.Item>
                           <TextField

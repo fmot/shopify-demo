@@ -9,9 +9,10 @@ const MAX_PRICE = 999999.99;
 export function BulkPriceUpdateContainer() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [selectedProducts, setSelectedProducts] = useState(new Set());
+  const [selectedVariants, setSelectedVariants] = useState(new Set());
   const [priceUpdates, setPriceUpdates] = useState({});
   const [priceErrors, setPriceErrors] = useState({});
+
   const app = useAppBridge();
   const queryClient = useQueryClient();
 
@@ -25,7 +26,7 @@ export function BulkPriceUpdateContainer() {
 
   const handleModalOpen = useCallback(() => {
     setIsModalOpen(true);
-    setSelectedProducts(new Set());
+    setSelectedVariants(new Set());
     setPriceUpdates({});
     setPriceErrors({});
   }, []);
@@ -34,13 +35,13 @@ export function BulkPriceUpdateContainer() {
     setIsModalOpen(false);
   }, []);
 
-  const handleProductSelect = useCallback((productId, selected) => {
-    setSelectedProducts((prev) => {
+  const handleVariantSelect = useCallback((variantId, selected) => {
+    setSelectedVariants((prev) => {
       const newSelected = new Set(prev);
       if (selected) {
-        newSelected.add(productId);
+        newSelected.add(variantId);
       } else {
-        newSelected.delete(productId);
+        newSelected.delete(variantId);
       }
       return newSelected;
     });
@@ -76,19 +77,14 @@ export function BulkPriceUpdateContainer() {
   }, []);
 
   const isFormValid = useCallback(() => {
-    const selectedVariantErrors = Array.from(selectedProducts).flatMap(
-      (productId) => {
-        const product = products?.find((p) => p.id === productId);
-        if (!product) return [];
-        return product.variants.map((variant) => priceErrors[variant.id]);
-      }
+    const selectedVariantErrors = Array.from(selectedVariants).map(
+      (variantId) => priceErrors[variantId]
     );
-
     return selectedVariantErrors.every((error) => !error);
-  }, [selectedProducts, products, priceErrors]);
+  }, [selectedVariants, priceErrors]);
 
   const handleUpdatePrices = async () => {
-    if (selectedProducts.size === 0) {
+    if (selectedVariants.size === 0) {
       app.toast.show("Please select at least one product");
       return;
     }
@@ -101,13 +97,16 @@ export function BulkPriceUpdateContainer() {
 
     setIsUpdating(true);
     try {
-      const updates = Array.from(selectedProducts).flatMap((productId) => {
-        const product = products.find((p) => p.id === productId);
-        return product.variants.map((variant) => ({
-          productId: productId,
-          variantId: variant.id,
-          price: priceUpdates[variant.id] || variant.price,
-        }));
+      const updates = Array.from(selectedVariants).map((variantId) => {
+        const product = products.find((p) =>
+          p.variants.some((v) => v.id === variantId)
+        );
+        const variant = product.variants.find((v) => v.id === variantId);
+        return {
+          productId: product.id,
+          variantId,
+          price: priceUpdates[variantId] ?? variant.price,
+        };
       });
 
       const response = await fetch("/api/bulk-update-prices", {
@@ -165,7 +164,7 @@ export function BulkPriceUpdateContainer() {
           content: "Save Changes",
           onAction: handleUpdatePrices,
           loading: isUpdating,
-          disabled: selectedProducts.size === 0 || !isFormValid(),
+          disabled: selectedVariants.size === 0 || !isFormValid(),
         }}
         secondaryActions={[
           {
@@ -179,10 +178,10 @@ export function BulkPriceUpdateContainer() {
           <BulkPriceUpdateForm
             products={products}
             isLoading={isLoading}
-            selectedProducts={selectedProducts}
+            selectedVariants={selectedVariants}
             priceUpdates={priceUpdates}
             priceErrors={priceErrors}
-            onProductSelect={handleProductSelect}
+            onVariantSelect={handleVariantSelect}
             onPriceChange={handlePriceChange}
           />
         </Modal.Section>
