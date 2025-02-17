@@ -6,7 +6,7 @@ export function UpdateTitle() {
   cron.schedule("* * * * *", async () => {
     console.log("[CRON] Starting product title update job...");
 
-    const shopDomain = process.env.SHOP_DOMAIN;
+    const shopDomain = "fumiya-shop.myshopify.com";
     const sessionId = shopify.api.session.getOfflineId(shopDomain);
     const session = await shopify.config.sessionStorage.loadSession(sessionId);
 
