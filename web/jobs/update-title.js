@@ -3,7 +3,7 @@ import shopify from "../shopify.js";
 import fetch from "node-fetch";
 
 export function UpdateTitle() {
-  cron.schedule("* * * * *", async () => {
+  cron.schedule("0 * * * *", async () => {
     console.log("[CRON] Starting product title update job...");
 
     const shopDomain = process.env.SHOP_DOMAIN;
