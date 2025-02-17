@@ -22,6 +22,7 @@ let sessionStorage;
 
 if (process.env.NODE_ENV === "production") {
   const redisClient = new Redis(process.env.REDIS_URL, {
+    lazyConnect: true,
     tls: {
       rejectUnauthorized: false,
     },
