@@ -3,7 +3,7 @@ import { shopifyApp } from "@shopify/shopify-app-express";
 import { SQLiteSessionStorage } from "@shopify/shopify-app-session-storage-sqlite";
 import { restResources } from "@shopify/shopify-api/rest/admin/2024-10";
 import Redis from "ioredis";
-import { RedisSessionStorage } from "@shopify/shopify-session-storage-redis";
+import { RedisSessionStorage } from "@shopify/shopify-app-session-storage-redis";
 
 const DB_PATH = `${process.cwd()}/database.sqlite`;
 
