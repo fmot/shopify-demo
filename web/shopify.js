@@ -2,6 +2,8 @@ import { BillingInterval, LATEST_API_VERSION } from "@shopify/shopify-api";
 import { shopifyApp } from "@shopify/shopify-app-express";
 import { SQLiteSessionStorage } from "@shopify/shopify-app-session-storage-sqlite";
 import { restResources } from "@shopify/shopify-api/rest/admin/2024-10";
+import Redis from "ioredis";
+import { RedisSessionStorage } from "@shopify/shopify-session-storage-redis";
 
 const DB_PATH = `${process.cwd()}/database.sqlite`;
 
@@ -15,6 +17,17 @@ const billingConfig = {
     interval: BillingInterval.OneTime,
   },
 };
+
+let sessionStorage;
+
+if (process.env.NODE_ENV === "production") {
+  const redisClient = new Redis(process.env.REDIS_URL);
+  sessionStorage = new RedisSessionStorage(redisClient);
+  console.log("Using Redis for session storage");
+} else {
+  sessionStorage = new SQLiteSessionStorage(DB_PATH);
+  console.log("Using SQLite for session storage");
+}
 
 const shopify = shopifyApp({
   api: {
@@ -36,7 +49,7 @@ const shopify = shopifyApp({
     path: "/api/webhooks",
   },
   // This should be replaced with your preferred storage strategy
-  sessionStorage: new SQLiteSessionStorage(DB_PATH),
+  sessionStorage,
 });
 
 export default shopify;
