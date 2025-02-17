@@ -1,14 +1,14 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "2d68e2aa756268c482be8da0b5029207"
+client_id = "2c684d749e9d7f978c770a8c561befda"
 application_url = "https://fumiya-shop-5f616ecce0ca.herokuapp.com"
 embedded = true
 name = "fumiya-shop"
 handle = "fumiya-shop"
 
 [build]
-automatically_update_urls_on_dev = true
 include_config_on_deploy = true
+automatically_update_urls_on_dev = true
 
 [webhooks]
 api_version = "2025-01"
