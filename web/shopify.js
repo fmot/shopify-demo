@@ -21,7 +21,11 @@ const billingConfig = {
 let sessionStorage;
 
 if (process.env.NODE_ENV === "production") {
-  const redisClient = new Redis(process.env.REDIS_URL);
+  const redisClient = new Redis(process.env.REDIS_URL, {
+    tls: {
+      rejectUnauthorized: false,
+    },
+  });
   sessionStorage = new RedisSessionStorage(redisClient);
   console.log("Using Redis for session storage");
 } else {
