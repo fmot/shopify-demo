@@ -105,7 +105,7 @@ export function BulkPriceUpdateContainer() {
         return {
           productId: product.id,
           variantId,
-          price: priceUpdates[variantId] ?? variant.price,
+          price: priceUpdates[variantId] || variant.price,
         };
       });
 
